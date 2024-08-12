@@ -8,5 +8,11 @@ namespace API.Specification
         {
             AddInclude(a => a.AppUser);
         }
+
+        public CommentWithSpecification(int id)
+        : base(a => a.Id == id)
+        {
+            AddInclude(a => a.AppUser);
+        }
     }
 }

@@ -1,11 +1,14 @@
 
+using API.CreateDtos;
 using API.Dtos;
 using API.Entities;
 using API.Entities.Identity;
+using API.Extensions;
 using API.Helper;
 using API.Interfaces;
 using API.Specification;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,11 +20,26 @@ namespace API.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
 
-        public ArticleController(IGenericRepository<Article> articleRepo, IMapper mapper, UserManager<AppUser> userManager)
+        public ArticleController(
+            IGenericRepository<Article> articleRepo, 
+            IMapper mapper, 
+            UserManager<AppUser> userManager
+            )
         {
             _articleRepo = articleRepo;
             _mapper = mapper;
             _userManager = userManager;
+        }
+
+        protected async Task<AppUser> GetAuthenticateUserAsync()
+        {
+            var email = User.GetEmail();
+
+            if (string.IsNullOrEmpty(email))
+                return null;
+
+            var user = await _userManager.FindByEmailAsync(email);
+            return user;
         }
 
         [HttpGet]
@@ -51,6 +69,36 @@ namespace API.Controllers
             var data = _mapper.Map<ArticleDto>(article);
 
             return Ok(data);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "AUTHOR, ADMIN")]
+        public async Task<ActionResult<ArticleDto>> CreateArticle([FromBody] ArticleCreateDto articleCreateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var user = await GetAuthenticateUserAsync();
+
+                if (user == null)
+                    return Unauthorized();
+
+                var newArticle = _mapper.Map<Article>(articleCreateDto);
+                newArticle.AppUserId = user.Id;
+                newArticle.PublicationDate = DateTime.Now;
+
+                await _articleRepo.Add(newArticle);
+
+                var article = _mapper.Map<ArticleDto>(newArticle);
+
+                return CreatedAtAction(nameof(GetArticle), new { id = newArticle.Id }, article);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

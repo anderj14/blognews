@@ -1,8 +1,12 @@
 
+using API.CreateDtos;
 using API.Dtos;
 using API.Entities;
+using API.Entities.Identity;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -11,11 +15,18 @@ namespace API.Controllers
     {
         private readonly IGenericRepository<Status> _statusRepo;
         private readonly IMapper _mapper;
+        private readonly UserManager<AppUser> _userManager;
 
-        public StatusesController(IGenericRepository<Status> statusRepo, IMapper mapper)
+        public StatusesController(
+            IGenericRepository<Status> statusRepo, 
+            IMapper mapper,
+            UserManager<AppUser> userManager
+
+            )
         {
             _statusRepo = statusRepo;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -34,6 +45,30 @@ namespace API.Controllers
             var statusDto = _mapper.Map<StatusDto>(status);
 
             return Ok(statusDto);
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<StatusDto>> CreateCategory([FromBody] StatusCreateDto statusCreateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var newStatus = _mapper.Map<Status>(statusCreateDto);
+
+                await _statusRepo.Add(newStatus);
+
+                var category = _mapper.Map<StatusDto>(newStatus);
+
+                return CreatedAtAction(nameof(GetStatus), new { id = newStatus.Id }, category);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

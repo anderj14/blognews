@@ -1,5 +1,4 @@
 
-
 namespace API.Dtos
 {
     public class ArticleDto

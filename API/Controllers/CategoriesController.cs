@@ -1,8 +1,10 @@
 
+using API.CreateDtos;
 using API.Dtos;
 using API.Entities;
 using API.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -34,6 +36,29 @@ namespace API.Controllers
             var categoryDto = _mapper.Map<CategoryDto>(category);
 
             return Ok(categoryDto);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<CategoryDto>> CreateCategory([FromBody] CategoryCreateDto categoryCreateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var newCategory = _mapper.Map<Category>(categoryCreateDto);
+
+                await _categoryRepository.Add(newCategory);
+
+                var category = _mapper.Map<CategoryDto>(newCategory);
+
+                return CreatedAtAction(nameof(GetCategory), new { id = newCategory.Id }, category);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
