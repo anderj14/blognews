@@ -18,7 +18,7 @@ namespace API.Controllers
         private readonly UserManager<AppUser> _userManager;
 
         public StatusesController(
-            IGenericRepository<Status> statusRepo, 
+            IGenericRepository<Status> statusRepo,
             IMapper mapper,
             UserManager<AppUser> userManager
 
@@ -59,11 +59,40 @@ namespace API.Controllers
             {
                 var newStatus = _mapper.Map<Status>(statusCreateDto);
 
-                await _statusRepo.Add(newStatus);
+                await _statusRepo.AddAsync(newStatus);
 
                 var category = _mapper.Map<StatusDto>(newStatus);
 
                 return CreatedAtAction(nameof(GetStatus), new { id = newStatus.Id }, category);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<StatusDto>> UpdateCategory(int id, StatusCreateDto statusUpdateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var status = await _statusRepo.GetByIdAsync(id);
+
+                if (status == null)
+                    return NotFound("Status not found");
+
+                _mapper.Map(statusUpdateDto, status);
+
+                await _statusRepo.UpdateAsync(status);
+
+                var statusUpdated = _mapper.Map<StatusDto>(status);
+
+                return Ok(statusUpdated);
+
             }
             catch (Exception ex)
             {

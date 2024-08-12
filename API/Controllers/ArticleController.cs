@@ -21,8 +21,8 @@ namespace API.Controllers
         private readonly UserManager<AppUser> _userManager;
 
         public ArticleController(
-            IGenericRepository<Article> articleRepo, 
-            IMapper mapper, 
+            IGenericRepository<Article> articleRepo,
+            IMapper mapper,
             UserManager<AppUser> userManager
             )
         {
@@ -72,7 +72,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "AUTHOR, ADMIN")]
+        [Authorize(Roles = "Author, Admin")]
         public async Task<ActionResult<ArticleDto>> CreateArticle([FromBody] ArticleCreateDto articleCreateDto)
         {
             if (!ModelState.IsValid)
@@ -89,11 +89,54 @@ namespace API.Controllers
                 newArticle.AppUserId = user.Id;
                 newArticle.PublicationDate = DateTime.Now;
 
-                await _articleRepo.Add(newArticle);
+                await _articleRepo.AddAsync(newArticle);
 
                 var article = _mapper.Map<ArticleDto>(newArticle);
 
                 return CreatedAtAction(nameof(GetArticle), new { id = newArticle.Id }, article);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Author, Admin")]
+        public async Task<ActionResult<ArticleDto>> UpdateArticle(int id, ArticleCreateDto articleUpdateDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data");
+            }
+
+            try
+            {
+                var user = await GetAuthenticateUserAsync();
+
+                if (user == null)
+                    return Unauthorized();
+
+                var spec = new ArticleWithAllSpecification(id);
+
+                var article = await _articleRepo.GetByIdAsync(id);
+
+                if (article == null)
+                {
+                    return NotFound("Article not found");
+                }
+
+                if (article.AppUserId != user.Id)
+                {
+                    return NotFound("User not authorized");
+                }
+
+                _mapper.Map(articleUpdateDto, article);
+                await _articleRepo.UpdateAsync(article);
+
+                var articleUpdated = _mapper.Map<ArticleDto>(article);
+
+                return Ok(articleUpdated);
             }
             catch (Exception ex)
             {

@@ -38,20 +38,20 @@ namespace API.Data.Repository
             return await ApplySpecification(spec).CountAsync();
         }
 
-        public async Task Add(T entity)
+        public async Task AddAsync(T entity)
         {
             await _context.AddAsync(entity);
             await _context.SaveChangesAsync();
         }
 
-        public async Task Update(T entity)
+        public async Task UpdateAsync(T entity)
         {
             _context.Set<T>().Attach(entity);
             _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
         }
-        public async Task Delete(T entity)
+        public async Task DeleteAsync(T entity)
         {
             _context.Remove(entity);
             await _context.SaveChangesAsync();

@@ -49,11 +49,38 @@ namespace API.Controllers
             {
                 var newCategory = _mapper.Map<Category>(categoryCreateDto);
 
-                await _categoryRepository.Add(newCategory);
+                await _categoryRepository.AddAsync(newCategory);
 
                 var category = _mapper.Map<CategoryDto>(newCategory);
 
                 return CreatedAtAction(nameof(GetCategory), new { id = newCategory.Id }, category);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<CategoryDto>> UpdateCategory(int id, CategoryCreateDto categoryUpdateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var category = await _categoryRepository.GetByIdAsync(id);
+                if (category == null)
+                    return NotFound("Category not found");
+
+                _mapper.Map(categoryUpdateDto, category);
+
+                await _categoryRepository.UpdateAsync(category);
+
+                var categoryUpdated = _mapper.Map<CategoryDto>(category);
+
+                return Ok(categoryUpdated);
             }
             catch (Exception ex)
             {

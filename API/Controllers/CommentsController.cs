@@ -78,11 +78,56 @@ namespace API.Controllers
                 newComment.AppUserId = user.Id;
                 newComment.CommentDate = DateTime.Now;
 
-                await _commentRepo.Add(newComment);
+                await _commentRepo.AddAsync(newComment);
 
                 var comment = _mapper.Map<CommentDto>(newComment);
 
                 return CreatedAtAction(nameof(GetComment), new { id = newComment.Id }, comment);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<ActionResult<CommentDto>> UpdateComment(int id, CommentCreateDto commentUpdateDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var user = await GetAuthenticateUserAsync();
+
+                if (user == null)
+                    return Unauthorized();
+
+
+                var spec = new CommentWithSpecification(id);
+
+                var comment = await _commentRepo.GetEntityWithSpec(spec);
+
+                if (comment == null)
+                {
+                    return NotFound("Comment not found");
+                }
+
+                var article = comment.Article;
+
+                if (comment.AppUserId != user.Id)
+                {
+                    return NotFound("User not authorized");
+                }
+
+                _mapper.Map(commentUpdateDto, comment);
+                await _commentRepo.UpdateAsync(comment);
+
+                var commentUpdate = _mapper.Map<CommentDto>(comment);
+
+                return Ok(commentUpdate);
+
             }
             catch (Exception ex)
             {
