@@ -87,5 +87,28 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteCategory(int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var category = await _categoryRepository.GetByIdAsync(id);
+                if (category == null)
+                    return NotFound("Category not found");
+
+                await _categoryRepository.DeleteAsync(category);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

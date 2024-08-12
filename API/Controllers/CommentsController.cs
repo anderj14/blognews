@@ -92,7 +92,7 @@ namespace API.Controllers
 
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<ActionResult<CommentDto>> UpdateComment(int id, CommentCreateDto commentUpdateDto)
+        public async Task<ActionResult> UpdateComment(int id, CommentCreateDto commentUpdateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data");
@@ -128,6 +128,47 @@ namespace API.Controllers
 
                 return Ok(commentUpdate);
 
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<ActionResult<CommentDto>> DeleteComment(int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var user = await GetAuthenticateUserAsync();
+
+                if (user == null)
+                    return Unauthorized();
+
+
+                var spec = new CommentWithSpecification(id);
+
+                var comment = await _commentRepo.GetEntityWithSpec(spec);
+
+                if (comment == null)
+                {
+                    return NotFound("Comment not found");
+                }
+
+                var article = comment.Article;
+
+                if (comment.AppUserId != user.Id)
+                {
+                    return NotFound("User not authorized");
+                }
+
+                await _commentRepo.DeleteAsync(comment);
+
+                return Ok();
             }
             catch (Exception ex)
             {

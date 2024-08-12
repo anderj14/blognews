@@ -71,9 +71,9 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<StatusDto>> UpdateCategory(int id, StatusCreateDto statusUpdateDto)
+        public async Task<ActionResult> UpdateCategory(int id)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data");
@@ -85,14 +85,9 @@ namespace API.Controllers
                 if (status == null)
                     return NotFound("Status not found");
 
-                _mapper.Map(statusUpdateDto, status);
+                await _statusRepo.DeleteAsync(status);
 
-                await _statusRepo.UpdateAsync(status);
-
-                var statusUpdated = _mapper.Map<StatusDto>(status);
-
-                return Ok(statusUpdated);
-
+                return Ok();
             }
             catch (Exception ex)
             {

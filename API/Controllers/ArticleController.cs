@@ -143,5 +143,45 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Author, Admin")]
+        public async Task<ActionResult> DeleteArticle(int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Invalid data");
+            }
+
+            try
+            {
+                var user = await GetAuthenticateUserAsync();
+
+                if (user == null)
+                    return Unauthorized();
+
+                var spec = new ArticleWithAllSpecification(id);
+
+                var article = await _articleRepo.GetByIdAsync(id);
+
+                if (article == null)
+                {
+                    return NotFound("Article not found");
+                }
+
+                if (article.AppUserId != user.Id)
+                {
+                    return NotFound("User not authorized");
+                }
+
+                await _articleRepo.DeleteAsync(article);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
