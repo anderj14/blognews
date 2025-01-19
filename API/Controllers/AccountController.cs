@@ -50,9 +50,9 @@ namespace API.Controllers
 
                 if (!result.Succeeded) return BadRequest(400);
 
-                var roleAddResult = await _userManager.AddToRoleAsync(appUser, "MEMBER");
+                // var roleAddResult = await _userManager.AddToRoleAsync(appUser, "MEMBER");
                 // var roleAddResult = await _userManager.AddToRolesAsync(appUser, new[] { "MEMBER","AUTHOR" });
-                // var roleAddResult = await _userManager.AddToRolesAsync(appUser, new[] { "MEMBER","AUTHOR", "ADMIN" });
+                var roleAddResult = await _userManager.AddToRolesAsync(appUser, new[] { "MEMBER","AUTHOR", "ADMIN" });
 
                 if (!roleAddResult.Succeeded) return BadRequest("Failed to add to role");
 
@@ -110,6 +110,5 @@ namespace API.Controllers
         {
             return await _userManager.FindByEmailAsync(email) != null;
         }
-
     }
 }

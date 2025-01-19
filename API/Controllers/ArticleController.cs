@@ -11,9 +11,11 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace API.Controllers
 {
+    [EnableRateLimiting("ArticleLimiter")]
     public class ArticleController : BaseApiController
     {
         private readonly IGenericRepository<Article> _articleRepo;
@@ -43,7 +45,6 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        // [Authorize]
         public async Task<ActionResult<Pagination<ArticleDto>>> GetArticles(
             [FromQuery] ArticleSpecParams articleSpecParams
             )
@@ -75,8 +76,7 @@ namespace API.Controllers
         [Authorize(Roles = "Author, Admin")]
         public async Task<ActionResult<ArticleDto>> CreateArticle([FromBody] ArticleCreateDto articleCreateDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest("Invalid data");
+            if (!ModelState.IsValid) return BadRequest("Invalid data");
 
             try
             {

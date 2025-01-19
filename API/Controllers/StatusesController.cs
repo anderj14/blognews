@@ -50,7 +50,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<StatusDto>> CreateCategory([FromBody] StatusCreateDto statusCreateDto)
+        public async Task<ActionResult<StatusDto>> CreateStatus([FromBody] StatusCreateDto statusCreateDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data");
@@ -71,9 +71,9 @@ namespace API.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> UpdateCategory(int id)
+        public async Task<ActionResult> UpdateStatus(int id)
         {
             if (!ModelState.IsValid)
                 return BadRequest("Invalid data");
@@ -82,6 +82,29 @@ namespace API.Controllers
             {
                 var status = await _statusRepo.GetByIdAsync(id);
 
+                if (status == null)
+                    return NotFound("Status not found");
+
+                await _statusRepo.UpdateAsync(status);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteStatus(int id)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest("Invalid data");
+
+            try
+            {
+                var status = await _statusRepo.GetByIdAsync(id);
                 if (status == null)
                     return NotFound("Status not found");
 

@@ -50,6 +50,7 @@ namespace API.Controllers
 
             return Ok(commentsDto);
         }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<IReadOnlyList<CommentDto>>> GetComment(int id)
         {
@@ -114,8 +115,6 @@ namespace API.Controllers
                     return NotFound("Comment not found");
                 }
 
-                var article = comment.Article;
-
                 if (comment.AppUserId != user.Id)
                 {
                     return NotFound("User not authorized");
@@ -158,8 +157,6 @@ namespace API.Controllers
                 {
                     return NotFound("Comment not found");
                 }
-
-                var article = comment.Article;
 
                 if (comment.AppUserId != user.Id)
                 {

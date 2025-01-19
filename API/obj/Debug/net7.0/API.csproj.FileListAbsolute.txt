@@ -25,7 +25,6 @@
 /Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/staticwebassets.build.json
 /Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/staticwebassets.development.json
 /Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/scopedcss/bundle/API.styles.css
-/Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/API.csproj.CopyComplete
 /Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/API.dll
 /Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/refint/API.dll
 /Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/API.pdb
@@ -83,3 +82,5 @@
 /Users/andersonfrias/Documents/workspace/net/blognews/API/bin/Debug/net7.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/andersonfrias/Documents/workspace/net/blognews/API/bin/Debug/net7.0/Microsoft.IdentityModel.Tokens.dll
 /Users/andersonfrias/Documents/workspace/net/blognews/API/bin/Debug/net7.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/API.sourcelink.json
+/Users/andersonfrias/Documents/workspace/net/blognews/API/obj/Debug/net7.0/API.csproj.Up2Date

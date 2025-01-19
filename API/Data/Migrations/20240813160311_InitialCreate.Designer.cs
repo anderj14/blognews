@@ -8,10 +8,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace API.Data.Migrations
+namespace API.Data.migrations
 {
     [DbContext(typeof(BlogNewsContext))]
-    [Migration("20240811150638_InitialCreate")]
+    [Migration("20240813160311_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -213,19 +213,19 @@ namespace API.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "772a3e25-d10f-441b-9fb3-ed354b176e59",
+                            Id = "54f1a80c-5454-40f6-8e85-4cc8df46bbed",
                             Name = "Member",
                             NormalizedName = "MEMBER"
                         },
                         new
                         {
-                            Id = "1b11612a-88ac-4159-9277-14094330a090",
+                            Id = "083edeb4-00ed-4615-99bc-a66c636907c8",
                             Name = "Author",
                             NormalizedName = "AUTHOR"
                         },
                         new
                         {
-                            Id = "95ec33fd-3bfd-4dfa-8a55-856d50c1458a",
+                            Id = "73360ad6-224d-45be-8d94-d293f76ad47b",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         });
